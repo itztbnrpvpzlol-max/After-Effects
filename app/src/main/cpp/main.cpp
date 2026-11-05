@@ -274,7 +274,7 @@ static void DrawWorkspace() {
     ImGui::End();
 }
 
-static void android_main(android_app* app) {
+void android_main(android_app* app) {
     app->onAppCmd = OnAppCmd;
     app->onInputEvent = OnInput;
     while (true) {
