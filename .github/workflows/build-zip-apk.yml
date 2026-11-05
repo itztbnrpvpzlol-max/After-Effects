@@ -1,0 +1,39 @@
+name: Build ZIP Project APK
+on:
+  push:
+    paths:
+      - "After-Effects-main (1).zip"
+      - ".github/workflows/build-zip-apk.yml"
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract uploaded project
+        run: |
+          mkdir extracted
+          unzip -q "After-Effects-main (1).zip" -d extracted
+          test -f "extracted/After-Effects-main/settings.gradle.kts"
+          echo "PROJECT_DIR=$GITHUB_WORKSPACE/extracted/After-Effects-main" >> "$GITHUB_ENV"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+      - name: Install Android build tools
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0" "ndk;27.0.12077973" "cmake;3.22.1"
+      - name: Build extracted project
+        run: gradle --no-daemon -p "$PROJECT_DIR" assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: after-effects-zip-project-debug
+          path: extracted/After-Effects-main/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
