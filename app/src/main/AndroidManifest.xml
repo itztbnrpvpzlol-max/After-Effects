@@ -1,0 +1,11 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application android:label="After Effects Mobile" android:theme="@android:style/Theme.Material.NoActionBar" android:hasCode="false" android:allowBackup="false">
+        <activity android:name="android.app.NativeActivity" android:configChanges="orientation|keyboardHidden|screenSize" android:screenOrientation="landscape" android:exported="true">
+            <meta-data android:name="android.app.lib_name" android:value="aftereffects" />
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>
