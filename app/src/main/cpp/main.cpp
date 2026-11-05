@@ -106,169 +106,264 @@ static void SectionTitle(const char* title) {
     ImGui::PopStyleColor();
 }
 
+
+static void PanelHeading(const char* name) {
+    ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.72f, 0.75f, 0.80f, 1));
+    ImGui::TextUnformatted(name);
+    ImGui::PopStyleColor();
+    ImGui::Separator();
+}
+
+static void MenuBarLike() {
+    ImGui::BeginChild("MainMenu", ImVec2(0, 28), false);
+    const char* menus[] = {"File", "Edit", "Composition", "Layer", "Effect", "Animation", "View", "Window", "Help"};
+    for (int i = 0; i < 9; ++i) {
+        ImGui::TextDisabled("%s", menus[i]);
+        if (i != 8) ImGui::SameLine(0, 15);
+    }
+    ImGui::EndChild();
+}
+
 static void DrawHome() {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
-    ImGui::Begin("Home", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
-    ImGui::TextColored(ImVec4(0.42f, 0.62f, 0.96f, 1), "Ae");
-    ImGui::SameLine();
-    ImGui::Text("AFTER EFFECTS");
-    ImGui::SameLine();
-    ImGui::TextDisabled("MOBILE");
+    ImGui::Begin("After Effects Start Workspace", nullptr,
+        ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBringToFrontOnFocus);
+
+    MenuBarLike();
+    ImGui::BeginChild("HomeWorkspace", ImVec2(0, ImGui::GetContentRegionAvail().y - 150), false);
+    const float fullW = ImGui::GetContentRegionAvail().x;
+    const float fullH = ImGui::GetContentRegionAvail().y;
+    const float leftW = fullW * 0.235f;
+    const float rightW = fullW * 0.16f;
+    const float centerW = fullW - leftW - rightW - 16.0f;
+
+    ImGui::BeginChild("HomeProjectPanel", ImVec2(leftW, fullH), true);
+    PanelHeading("Project");
+    ImGui::Spacing();
+    ImGui::TextDisabled("Search");
+    ImGui::SetNextItemWidth(-1);
+    static char searchProject[80] = "";
+    ImGui::InputText("##projectsearch", searchProject, IM_ARRAYSIZE(searchProject));
+    ImGui::Spacing();
+    ImGui::TextDisabled("Name                         Type");
     ImGui::Separator();
-    ImGui::Spacing();
-    ImGui::Text("Good to see you.");
-    ImGui::TextDisabled("Create a composition or continue a recent project.");
-    ImGui::Spacing();
-
-    ImGui::BeginChild("CreatePanel", ImVec2(0, 112), true);
-    SectionTitle("START A NEW PROJECT");
-    ImGui::InputText("Project name", g_ProjectName, IM_ARRAYSIZE(g_ProjectName));
-    ImGui::SameLine();
-    if (ImGui::Button("Create Project", ImVec2(145, 0))) g_Workspace = true;
+    ImGui::Selectable("  Project", false);
     ImGui::EndChild();
+    ImGui::SameLine();
 
+    ImGui::BeginChild("HomeCenterPanel", ImVec2(centerW, fullH), true);
+    ImGui::SetCursorPosY(ImGui::GetCursorPosY() + fullH * 0.24f);
+    const float cardW = std::min(250.0f, (centerW - 55.0f) * 0.5f);
+    const float cardH = std::min(270.0f, fullH * 0.60f);
+    const float cardsW = cardW * 2 + 24.0f;
+    ImGui::SetCursorPosX(std::max(12.0f, (centerW - cardsW) * 0.5f));
+    ImGui::BeginChild("NewCompositionCard", ImVec2(cardW, cardH), true);
+    ImGui::SetCursorPosY(cardH * 0.25f);
+    ImGui::SetCursorPosX(cardW * 0.5f - 33);
+    ImGui::TextColored(ImVec4(0.68f, 0.70f, 0.75f, 1), "[ + ]");
     ImGui::Spacing();
-    SectionTitle("NEW COMPOSITION");
-    ImGui::BeginChild("Templates", ImVec2(0, 125), false);
-    const char* names[] = { "Mobile 1080 x 1920", "HD 1920 x 1080", "Square 1080 x 1080" };
-    for (int i = 0; i < 3; ++i) {
-        ImGui::PushID(i);
-        ImGui::BeginChild("TemplateCard", ImVec2(190, 100), true);
-        ImGui::TextColored(ImVec4(0.45f, 0.66f, 0.98f, 1), "COMPOSITION");
-        ImGui::TextWrapped("%s", names[i]);
-        if (ImGui::SmallButton("Create")) {
-            if (i == 0) snprintf(g_CompositionName, sizeof(g_CompositionName), "Mobile Composition");
-            if (i == 1) snprintf(g_CompositionName, sizeof(g_CompositionName), "HD Composition");
-            if (i == 2) snprintf(g_CompositionName, sizeof(g_CompositionName), "Square Composition");
-            g_Workspace = true;
-        }
-        ImGui::EndChild();
-        ImGui::PopID();
-        if (i != 2) ImGui::SameLine();
+    ImGui::SetCursorPosX(12);
+    ImGui::TextWrapped("New Composition");
+    ImGui::SetCursorPosY(cardH - 42);
+    if (ImGui::Button("New Composition", ImVec2(-1, 30))) {
+        snprintf(g_CompositionName, sizeof(g_CompositionName), "Comp 1");
+        g_Workspace = true;
     }
     ImGui::EndChild();
-
+    ImGui::SameLine(0, 24);
+    ImGui::BeginChild("NewFootageCard", ImVec2(cardW, cardH), true);
+    ImGui::SetCursorPosY(cardH * 0.25f);
+    ImGui::SetCursorPosX(cardW * 0.5f - 33);
+    ImGui::TextColored(ImVec4(0.68f, 0.70f, 0.75f, 1), "[ + ]");
     ImGui::Spacing();
-    SectionTitle("RECENT PROJECTS");
-    ImGui::BeginChild("Recent", ImVec2(0, 0), true);
-    if (ImGui::Selectable("  Untitled Project     •     Just now", false, 0, ImVec2(0, 34))) g_Workspace = true;
+    ImGui::SetCursorPosX(12);
+    ImGui::TextWrapped("New Composition From Footage");
+    ImGui::SetCursorPosY(cardH - 42);
+    if (ImGui::Button("From Footage", ImVec2(-1, 30))) ImGui::OpenPopup("FootageInfo");
+    if (ImGui::BeginPopup("FootageInfo")) {
+        ImGui::TextWrapped("Footage import will be connected in the media-import milestone.");
+        ImGui::EndPopup();
+    }
+    ImGui::EndChild();
+    ImGui::EndChild();
+    ImGui::SameLine();
+
+    ImGui::BeginChild("HomeRightPanels", ImVec2(0, fullH), false);
+    const char* rightPanels[] = {"Info", "Audio", "Preview", "Effects & Presets", "Align", "Libraries", "Character", "Paragraph"};
+    for (int i = 0; i < 8; ++i) {
+        ImGui::BeginChild(rightPanels[i], ImVec2(0, i == 2 ? 105 : 48), true);
+        ImGui::TextUnformatted(rightPanels[i]);
+        if (i == 2) ImGui::TextDisabled("Play   Stop   Next Frame");
+        ImGui::EndChild();
+    }
+    ImGui::EndChild();
+    ImGui::EndChild();
+
+    ImGui::BeginChild("RenderQueuePanel", ImVec2(0, 0), true);
+    ImGui::Text("Render Queue");
+    ImGui::Separator();
+    ImGui::TextDisabled("Render Settings                         Status                         Output To");
     ImGui::EndChild();
     ImGui::End();
 }
 
 static void DrawToolbar() {
-    ImGui::BeginChild("Toolbar", ImVec2(0, 46), true);
-    const char* tools[] = { "Select", "Hand", "Text", "Shape", "Pen", "Zoom" };
-    for (int i = 0; i < 6; ++i) {
+    ImGui::BeginChild("ToolOptionsBar", ImVec2(0, 38), true);
+    const char* tools[] = {"V", "H", "Z", "Rotate", "Camera", "Pan Behind", "Shape", "Pen", "Text", "Brush", "Clone", "Eraser", "Roto Brush"};
+    for (int i = 0; i < 13; ++i) {
         ImGui::PushID(i);
-        if (i == g_SelectedTool) ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.25f, 0.39f, 0.62f, 1));
-        if (ImGui::Button(tools[i], ImVec2(72, 28))) g_SelectedTool = i;
+        if (i == g_SelectedTool) ImGui::PushStyleColor(ImGuiCol_Button, ImVec4(0.20f, 0.34f, 0.57f, 1));
+        if (ImGui::Button(tools[i], ImVec2(i < 3 ? 32 : 68, 25))) g_SelectedTool = i;
         if (i == g_SelectedTool) ImGui::PopStyleColor();
         ImGui::PopID();
-        if (i != 5) ImGui::SameLine();
+        if (i != 12) ImGui::SameLine(0, 3);
     }
+    ImGui::SameLine();
+    ImGui::TextDisabled("Fill  Stroke  2 px     Essentials");
     ImGui::EndChild();
 }
 
 static void DrawWorkspace() {
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImGui::GetIO().DisplaySize);
-    ImGui::Begin("Editor", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoSavedSettings);
-    if (ImGui::Button("< Projects", ImVec2(95, 30))) g_Workspace = false;
-    ImGui::SameLine();
-    ImGui::Text("%s", g_ProjectName);
-    ImGui::SameLine();
-    ImGui::TextDisabled("/ %s", g_CompositionName);
-    ImGui::SameLine();
-    ImGui::SetCursorPosX(ImGui::GetWindowWidth() - 120);
-    if (ImGui::Button("Export", ImVec2(90, 30))) ImGui::OpenPopup("ExportInfo");
-    if (ImGui::BeginPopup("ExportInfo")) {
-        ImGui::TextWrapped("Export rendering will be added in a later milestone.");
-        ImGui::EndPopup();
-    }
-    ImGui::Separator();
+    ImGui::Begin("After Effects Editor", nullptr,
+        ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoMove |
+        ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoBringToFrontOnFocus);
+
+    MenuBarLike();
     DrawToolbar();
 
-    const float available = ImGui::GetContentRegionAvail().y;
-    const float timelineHeight = std::max(150.0f, available * 0.37f);
-    ImGui::BeginChild("PreviewArea", ImVec2(0, available - timelineHeight - 8), false);
-    const float leftWidth = ImGui::GetContentRegionAvail().x * 0.20f;
-    ImGui::BeginChild("ProjectPanel", ImVec2(leftWidth, 0), true);
-    SectionTitle("PROJECT");
-    if (ImGui::Selectable("▸ " "Compositions", true)) {}
-    ImGui::Indent(12);
-    ImGui::Selectable("  Main Composition", true);
-    ImGui::Unindent(12);
+    const float availH = ImGui::GetContentRegionAvail().y;
+    const float timelineH = std::max(235.0f, availH * 0.43f);
+    const float upperH = availH - timelineH - 6.0f;
+    const float totalW = ImGui::GetContentRegionAvail().x;
+    const float leftW = totalW * 0.235f;
+    const float rightW = totalW * 0.16f;
+    const float centerW = totalW - leftW - rightW - 12.0f;
+
+    ImGui::BeginChild("UpperWorkspace", ImVec2(0, upperH), false);
+    ImGui::BeginChild("LeftDock", ImVec2(leftW, 0), false);
+    ImGui::BeginChild("ProjectDock", ImVec2(0, upperH * 0.62f), true);
+    ImGui::Text("Project");
+    ImGui::SameLine();
+    ImGui::TextDisabled("  Effect Controls");
     ImGui::Separator();
-    SectionTitle("EFFECTS & PRESETS");
-    ImGui::TextDisabled("Search effects...");
+    ImGui::TextDisabled("Search");
+    static char projectSearch[64] = "";
+    ImGui::SetNextItemWidth(-1);
+    ImGui::InputText("##editorsearch", projectSearch, IM_ARRAYSIZE(projectSearch));
+    ImGui::Separator();
+    ImGui::TextDisabled("Name                    Type");
+    ImGui::Selectable("Comp 1        Composition", true);
+    ImGui::EndChild();
+    ImGui::BeginChild("EffectControlsDock", ImVec2(0, 0), true);
+    ImGui::Text("Effect Controls");
+    ImGui::Separator();
+    ImGui::TextDisabled("No effect selected");
+    ImGui::EndChild();
     ImGui::EndChild();
     ImGui::SameLine();
 
-    ImGui::BeginChild("CompositionPanel", ImVec2(0, 0), true);
-    SectionTitle("COMPOSITION");
+    ImGui::BeginChild("CompositionViewer", ImVec2(centerW, 0), true);
+    ImGui::Text("Composition");
     ImGui::SameLine();
-    ImGui::TextDisabled("  Active Camera  |  50%  |  Full");
-    ImGui::Spacing();
-    ImVec2 canvasSize = ImGui::GetContentRegionAvail();
-    float aspect = 16.0f / 9.0f;
-    float w = std::min(canvasSize.x * 0.84f, canvasSize.y * aspect);
-    float h = w / aspect;
-    if (h > canvasSize.y * 0.88f) { h = canvasSize.y * 0.88f; w = h * aspect; }
-    ImVec2 p = ImGui::GetCursorScreenPos();
-    p.x += (canvasSize.x - w) * 0.5f;
-    p.y += (canvasSize.y - h) * 0.5f;
-    ImDrawList* draw = ImGui::GetWindowDrawList();
-    draw->AddRectFilled(p, ImVec2(p.x + w, p.y + h), IM_COL32(25, 29, 39, 255), 2.0f);
-    draw->AddRect(p, ImVec2(p.x + w, p.y + h), IM_COL32(75, 91, 117, 255));
-    draw->AddText(ImVec2(p.x + 18, p.y + 18), IM_COL32(210, 218, 232, 255), "Composition Preview");
-    draw->AddText(ImVec2(p.x + 18, p.y + 42), IM_COL32(115, 132, 158, 255), "Your visual work appears here");
-    ImGui::Dummy(ImVec2(canvasSize.x, canvasSize.y));
+    ImGui::TextColored(ImVec4(0.34f, 0.58f, 0.91f, 1), "%s", g_CompositionName);
+    ImGui::SameLine();
+    ImGui::SetCursorPosX(std::max(ImGui::GetCursorPosX(), centerW - 250));
+    ImGui::TextDisabled("50%    Full    Active Camera    1 View");
+    ImGui::Separator();
+    ImVec2 region = ImGui::GetContentRegionAvail();
+    ImVec2 canvas = ImVec2(region.x * 0.96f, region.y * 0.88f);
+    ImVec2 cp = ImGui::GetCursorScreenPos();
+    cp.x += (region.x - canvas.x) * 0.5f;
+    cp.y += (region.y - canvas.y) * 0.5f;
+    ImDrawList* dl = ImGui::GetWindowDrawList();
+    dl->AddRectFilled(cp, ImVec2(cp.x + canvas.x, cp.y + canvas.y), IM_COL32(0, 0, 0, 255));
+    const float unit = std::min(canvas.x / 6.0f, canvas.y / 3.3f);
+    ImVec2 circleCenter(cp.x + canvas.x * 0.20f, cp.y + canvas.y * 0.32f);
+    dl->AddCircleFilled(circleCenter, unit * 0.48f, IM_COL32(205, 238, 24, 255), 48);
+    dl->AddCircle(circleCenter, unit * 0.48f, IM_COL32(238, 238, 238, 255), 48, 2.0f);
+    dl->AddRectFilled(ImVec2(cp.x + canvas.x * 0.78f, cp.y + canvas.y * 0.46f),
+        ImVec2(cp.x + canvas.x * 0.90f, cp.y + canvas.y * 0.72f), IM_COL32(205, 238, 24, 255));
+    dl->AddRect(ImVec2(cp.x + canvas.x * 0.78f, cp.y + canvas.y * 0.46f),
+        ImVec2(cp.x + canvas.x * 0.90f, cp.y + canvas.y * 0.72f), IM_COL32(240, 240, 240, 255), 0, 0, 2);
+    ImGui::Dummy(region);
+    ImGui::EndChild();
+    ImGui::SameLine();
+
+    ImGui::BeginChild("RightDock", ImVec2(0, 0), false);
+    const char* panels[] = {"Info", "Audio", "Preview", "Effects & Presets", "Align", "Libraries", "Character", "Paragraph"};
+    for (int i = 0; i < 8; ++i) {
+        ImGui::BeginChild(panels[i], ImVec2(0, i == 2 ? 116 : 42), true);
+        ImGui::TextUnformatted(panels[i]);
+        if (i == 2) {
+            ImGui::TextDisabled("  |<   <<   Play   >>   >|");
+            ImGui::TextDisabled("Shortcut: Spacebar");
+        }
+        ImGui::EndChild();
+    }
     ImGui::EndChild();
     ImGui::EndChild();
 
-    ImGui::BeginChild("Timeline", ImVec2(0, timelineHeight), true);
-    ImGui::Text("TIMELINE");
+    ImGui::BeginChild("TimelineDock", ImVec2(0, timelineH), true);
+    ImGui::Text("%s", g_CompositionName);
     ImGui::SameLine();
-    ImGui::TextDisabled("%s", g_CompositionName);
+    ImGui::TextDisabled("  Render Queue");
     ImGui::SameLine();
+    ImGui::SetCursorPosX(std::max(ImGui::GetCursorPosX(), totalW - 245));
     if (ImGui::SmallButton(g_Playing ? "Pause" : "Play")) g_Playing = !g_Playing;
     ImGui::SameLine();
     if (ImGui::SmallButton("Add Layer")) ImGui::OpenPopup("AddLayer");
     if (ImGui::BeginPopup("AddLayer")) {
-        if (ImGui::MenuItem("Text")) { g_SelectedLayer = 0; }
-        if (ImGui::MenuItem("Shape")) { g_SelectedLayer = 1; }
-        if (ImGui::MenuItem("Solid")) { g_SelectedLayer = 2; }
+        if (ImGui::MenuItem("Text")) g_SelectedLayer = 0;
+        if (ImGui::MenuItem("Shape")) g_SelectedLayer = 1;
+        if (ImGui::MenuItem("Solid")) g_SelectedLayer = 2;
         ImGui::EndPopup();
     }
     ImGui::Separator();
-    ImGui::BeginChild("LayerNames", ImVec2(170, 0), true);
-    SectionTitle("LAYER");
-    const char* layers[] = { "Text Layer 1", "Shape Layer 1", "Background" };
+
+    const float namesW = std::min(310.0f, totalW * 0.25f);
+    ImGui::BeginChild("TimelineLayerList", ImVec2(namesW, 0), true);
+    ImGui::TextDisabled("Source Name                         Mode");
+    ImGui::Separator();
+    const char* layers[] = {"Shape Layer 2", "Shape Layer 1", "Background"};
     for (int i = 0; i < 3; ++i) {
-        if (ImGui::Selectable(layers[i], g_SelectedLayer == i)) g_SelectedLayer = i;
+        ImGui::PushID(i);
+        if (ImGui::Selectable(layers[i], g_SelectedLayer == i, 0, ImVec2(0, 38))) g_SelectedLayer = i;
+        ImGui::PopID();
     }
     ImGui::EndChild();
     ImGui::SameLine();
-    ImGui::BeginChild("Tracks", ImVec2(0, 0), true);
-    ImDrawList* timelineDraw = ImGui::GetWindowDrawList();
+
+    ImGui::BeginChild("TimelineTracks", ImVec2(0, 0), true);
     ImVec2 origin = ImGui::GetCursorScreenPos();
-    float trackWidth = ImGui::GetContentRegionAvail().x;
+    float trackW = ImGui::GetContentRegionAvail().x;
+    ImDrawList* td = ImGui::GetWindowDrawList();
+    const float rulerH = 32.0f;
+    td->AddRectFilled(origin, ImVec2(origin.x + trackW, origin.y + rulerH), IM_COL32(37, 40, 47, 255));
+    for (int i = 0; i <= 12; ++i) {
+        float x = origin.x + trackW * i / 12.0f;
+        td->AddLine(ImVec2(x, origin.y), ImVec2(x, origin.y + rulerH), IM_COL32(88, 94, 105, 255));
+        char label[16]; snprintf(label, sizeof(label), "%02ds", i);
+        td->AddText(ImVec2(x + 3, origin.y + 5), IM_COL32(190, 195, 204, 255), label);
+    }
     for (int i = 0; i < 3; ++i) {
-        float y = origin.y + 8 + i * 29;
-        timelineDraw->AddLine(ImVec2(origin.x, y + 23), ImVec2(origin.x + trackWidth, y + 23), IM_COL32(55, 63, 78, 255));
-        timelineDraw->AddRectFilled(ImVec2(origin.x + 8 + i * 9, y + 4), ImVec2(origin.x + trackWidth * (0.72f - i * 0.08f), y + 20), i == g_SelectedLayer ? IM_COL32(72, 119, 190, 255) : IM_COL32(63, 83, 113, 255), 4);
-        for (int k = 0; k < 3; ++k) {
-            float kx = origin.x + trackWidth * (0.28f + k * 0.22f);
-            timelineDraw->AddCircleFilled(ImVec2(kx, y + 12), 3.5f, IM_COL32(225, 190, 92, 255));
+        float y = origin.y + rulerH + 8 + i * 45.0f;
+        td->AddLine(ImVec2(origin.x, y + 38), ImVec2(origin.x + trackW, y + 38), IM_COL32(57, 63, 73, 255));
+        td->AddRectFilled(ImVec2(origin.x + 4, y + 5), ImVec2(origin.x + trackW * (0.96f - i * 0.06f), y + 31),
+            i == g_SelectedLayer ? IM_COL32(71, 111, 173, 255) : IM_COL32(67, 83, 108, 255), 3);
+        for (int k = 0; k < 2 + (i == 0); ++k) {
+            float kx = origin.x + trackW * (0.02f + k * 0.13f);
+            td->AddDiamond(ImVec2(kx, y + 18), 5, IM_COL32(230, 193, 94, 255));
         }
     }
-    ImGui::InvisibleButton("PlayheadTrack", ImVec2(trackWidth, 100));
-    if (ImGui::IsItemActive()) g_Playhead = std::clamp((ImGui::GetIO().MousePos.x - origin.x) / std::max(1.0f, trackWidth), 0.0f, 1.0f);
-    float px = origin.x + trackWidth * g_Playhead;
-    timelineDraw->AddLine(ImVec2(px, origin.y - 4), ImVec2(px, origin.y + 100), IM_COL32(245, 91, 91, 255), 2.0f);
-    timelineDraw->AddTriangleFilled(ImVec2(px - 6, origin.y - 5), ImVec2(px + 6, origin.y - 5), ImVec2(px, origin.y + 3), IM_COL32(245, 91, 91, 255));
+    ImGui::InvisibleButton("TimelineScrub", ImVec2(trackW, rulerH + 145));
+    if (ImGui::IsItemActive()) g_Playhead = std::clamp((ImGui::GetIO().MousePos.x - origin.x) / std::max(1.0f, trackW), 0.0f, 1.0f);
+    float playX = origin.x + trackW * g_Playhead;
+    td->AddLine(ImVec2(playX, origin.y), ImVec2(playX, origin.y + rulerH + 145), IM_COL32(82, 157, 246, 255), 2.0f);
+    td->AddTriangleFilled(ImVec2(playX - 6, origin.y), ImVec2(playX + 6, origin.y), ImVec2(playX, origin.y + 9), IM_COL32(82, 157, 246, 255));
     ImGui::EndChild();
     ImGui::EndChild();
     ImGui::End();
