@@ -89,7 +89,6 @@ private fun Panel(
     Column(
         modifier
             .background(PanelBg)
-            .border(1.dp, Border, RoundedCornerShape(3.dp))
             .padding(contentPadding),
         content = content
     )
@@ -117,7 +116,7 @@ private fun HomeWorkspace(onNewComposition: () -> Unit) {
     Column(Modifier.fillMaxSize().background(AppBg).padding(7.dp)) {
         MenuStrip()
         Spacer(Modifier.height(5.dp))
-        Row(Modifier.weight(0.69f).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(5.dp)) {
+        Row(Modifier.weight(0.69f).fillMaxWidth()) {
             Panel(Modifier.weight(0.235f).fillMaxHeight()) {
                 AeText("Project", size = 13)
                 Spacer(Modifier.height(7.dp))
@@ -136,7 +135,8 @@ private fun HomeWorkspace(onNewComposition: () -> Unit) {
                 Spacer(Modifier.height(8.dp))
                 AeText("  Project", size = 11)
             }
-            Panel(Modifier.weight(0.605f).fillMaxHeight(), PaddingValues(12.dp)) {
+            Box(Modifier.width(1.dp).fillMaxHeight().background(Border))
+            Panel(Modifier.weight(0.765f).fillMaxHeight(), PaddingValues(18.dp)) {
                 Row(
                     Modifier.fillMaxSize(),
                     horizontalArrangement = Arrangement.Center,
@@ -156,18 +156,6 @@ private fun HomeWorkspace(onNewComposition: () -> Unit) {
                         onClick = onNewComposition
                     )
                 }
-            }
-            Column(Modifier.weight(0.16f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(5.dp)) {
-                SidePanel("Info", Modifier.weight(0.85f))
-                SidePanel("Audio", Modifier.weight(0.85f))
-                Panel(Modifier.weight(1.35f).fillMaxWidth()) {
-                    AeText("Preview", size = 12)
-                    Spacer(Modifier.height(8.dp))
-                    AeText("◀   ◀   Play   ▶   ▶", color = TextMuted, size = 10)
-                }
-                SidePanel("Effects & Presets", Modifier.weight(0.85f))
-                SidePanel("Align", Modifier.weight(0.75f))
-                SidePanel("Libraries", Modifier.weight(0.75f))
             }
         }
         Spacer(Modifier.height(6.dp))
@@ -195,7 +183,6 @@ private fun CompositionTile(
     Column(
         modifier
             .background(Color(0xFF202020))
-            .border(1.dp, Border, RoundedCornerShape(3.dp))
             .clickable(onClick = onClick)
             .padding(13.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -250,7 +237,7 @@ private fun EditorWorkspace(compositionName: String, onBack: () -> Unit) {
             AeText("Fill     Stroke  2 px       Essentials", color = TextMuted, size = 10)
         }
         Spacer(Modifier.height(4.dp))
-        Row(Modifier.weight(0.57f).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(Modifier.weight(0.57f).fillMaxWidth()) {
             Column(Modifier.weight(0.235f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Panel(Modifier.weight(0.62f).fillMaxWidth()) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -268,7 +255,8 @@ private fun EditorWorkspace(compositionName: String, onBack: () -> Unit) {
                     AeText("Effect Controls", size = 11)
                 }
             }
-            Panel(Modifier.weight(0.605f).fillMaxHeight(), PaddingValues(6.dp)) {
+            Box(Modifier.width(1.dp).fillMaxHeight().background(Border))
+            Panel(Modifier.weight(0.765f).fillMaxHeight(), PaddingValues(8.dp)) {
                 Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                     AeText("Composition", size = 11)
                     AeText("  $compositionName", color = Blue, size = 11)
@@ -285,18 +273,6 @@ private fun EditorWorkspace(compositionName: String, onBack: () -> Unit) {
                         drawRect(Color.LightGray, Offset(size.width * 0.78f, size.height * 0.46f), Size(size.width * 0.10f, size.height * 0.26f), style = Stroke(2.dp.toPx()))
                     }
                 }
-            }
-            Column(Modifier.weight(0.16f).fillMaxHeight(), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                SidePanel("Info", Modifier.weight(0.8f))
-                SidePanel("Audio", Modifier.weight(0.8f))
-                Panel(Modifier.weight(1.3f).fillMaxWidth()) {
-                    AeText("Preview", size = 11)
-                    Spacer(Modifier.height(7.dp))
-                    AeText("◀  ◀  Play  ▶  ▶", color = TextMuted, size = 9)
-                    AeText("Shortcut: Spacebar", color = TextMuted, size = 9)
-                }
-                SidePanel("Effects & Presets", Modifier.weight(0.9f))
-                SidePanel("Align", Modifier.weight(0.8f))
             }
         }
         Spacer(Modifier.height(4.dp))
