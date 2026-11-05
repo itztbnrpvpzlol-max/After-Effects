@@ -351,7 +351,6 @@ private fun EditorWorkspace(compositionName: String, onBack: () -> Unit) {
                         val px = size.width * playhead
                         drawLine(Color(0xFF62A0F0), Offset(px, 0f), Offset(px, size.height), 2.dp.toPx())
                     }
-                    androidx.compose.foundation.gestures.detectTapGestures
                 }
             }
         }
