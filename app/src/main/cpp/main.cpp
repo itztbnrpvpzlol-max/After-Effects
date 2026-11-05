@@ -356,7 +356,7 @@ static void DrawWorkspace() {
             i == g_SelectedLayer ? IM_COL32(71, 111, 173, 255) : IM_COL32(67, 83, 108, 255), 3);
         for (int k = 0; k < 2 + (i == 0); ++k) {
             float kx = origin.x + trackW * (0.02f + k * 0.13f);
-            td->AddDiamond(ImVec2(kx, y + 18), 5, IM_COL32(230, 193, 94, 255));
+            td->AddQuadFilled(ImVec2(kx, y + 12), ImVec2(kx + 5, y + 18), ImVec2(kx, y + 24), ImVec2(kx - 5, y + 18), IM_COL32(230, 193, 94, 255));
         }
     }
     ImGui::InvisibleButton("TimelineScrub", ImVec2(trackW, rulerH + 145));
