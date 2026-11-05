@@ -24,7 +24,7 @@ target_include_directories(imgui_android PUBLIC ${imgui_SOURCE_DIR} ${IMGUI_BACK
 target_link_libraries(imgui_android PUBLIC android EGL GLESv3)
 
 add_library(aftereffects SHARED main.cpp)
-target_include_directories(aftereffects PRIVATE ${ANDROID_NDK}/sources/android/native_app_glue)
-target_sources(aftereffects PRIVATE ${ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
+target_include_directories(aftereffects PRIVATE ${CMAKE_ANDROID_NDK}/sources/android/native_app_glue)
+target_sources(aftereffects PRIVATE ${CMAKE_ANDROID_NDK}/sources/android/native_app_glue/android_native_app_glue.c)
 target_link_options(aftereffects PRIVATE "-u" "ANativeActivity_onCreate")
 target_link_libraries(aftereffects PRIVATE imgui_android android log EGL GLESv3)
